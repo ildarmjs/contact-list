@@ -11,6 +11,7 @@ export const MainMenu = () => {
 				<Nav className='me-auto'>
 					<Nav.Link href='/groups'>Группы</Nav.Link>
 					<Nav.Link href='/favorit'>Избранное</Nav.Link>
+					<Nav.Link href='/contact'>Контакты</Nav.Link>
 				</Nav>
 			</Container>
 		</Navbar>
