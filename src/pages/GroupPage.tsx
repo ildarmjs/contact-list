@@ -1,4 +1,4 @@
-import { memo } from 'react'
+import { memo, useEffect } from 'react'
 import { Col, Row } from 'react-bootstrap'
 import { useParams } from 'react-router-dom'
 import { GroupContactsCard } from 'src/components/GroupContactsCard'
@@ -6,14 +6,21 @@ import { Empty } from 'src/components/Empty'
 import { ContactCard } from 'src/components/ContactCard'
 import { useGetGroupsQuery } from 'src/redux/groups-api'
 import { useGetContactsQuery } from 'src/redux/contacts-api'
+import { asyncStore } from 'src/mobx/store'
 
 export const GroupPage = memo(() => {
 	const { groupId } = useParams<{ groupId: string }>()
-	const { data: groupContactsState } = useGetGroupsQuery()
-	const { data: contactsState } = useGetContactsQuery()
-	const findGroup = groupContactsState?.find(({ id }) => id === groupId)
-	const contacts = findGroup
-		? contactsState?.filter(({ id }) => findGroup.contactIds.includes(id))
+	const { loading, error, fetchContacts, fetchGroups, contacts, groups } =
+		asyncStore
+
+	useEffect(() => {
+		fetchContacts()
+		fetchGroups()
+	}, [fetchContacts, fetchGroups])
+	const findGroup = groups.find(({ id }) => id === groupId)
+
+	const filteredContacts = findGroup
+		? contacts.filter(({ id }) => findGroup.contactIds.includes(id))
 		: []
 
 	return (
@@ -29,7 +36,7 @@ export const GroupPage = memo(() => {
 					</Col>
 					<Col>
 						<Row xxl={4} className='g-4'>
-							{contacts?.map(contact => (
+							{filteredContacts?.map(contact => (
 								<Col key={contact.id}>
 									<ContactCard contact={contact} withLink />
 								</Col>

@@ -1,13 +1,20 @@
-import { FC } from 'react'
+import { observer } from 'mobx-react-lite'
+import { FC, useEffect } from 'react'
 import { Col, Row } from 'react-bootstrap'
 import { useParams } from 'react-router-dom'
 import { ContactCard } from 'src/components/ContactCard'
 import { Empty } from 'src/components/Empty'
+import { asyncStore } from 'src/mobx/store'
 import { useGetContactsQuery } from 'src/redux/contacts-api'
 
-export const ContactPage: FC = () => {
+export const ContactPage: FC = observer(() => {
 	const { contactId } = useParams<{ contactId: string }>()
-	const { data: contacts } = useGetContactsQuery()
+	const { fetchContacts, contacts } = asyncStore
+
+	useEffect(() => {
+		fetchContacts() // Загружаем контакты при монтировании компонента
+	}, [fetchContacts])
+
 	const contact = contacts?.find(({ id }: { id: string }) => id === contactId)
 
 	return (
@@ -17,4 +24,4 @@ export const ContactPage: FC = () => {
 			</Col>
 		</Row>
 	)
-}
+})
